@@ -1,4 +1,4 @@
-# README
+# Deep-Learning-for-Music-Analysis-and-Generation-Homework1 README
 
 ## 41147009S 陳炫佑
 
