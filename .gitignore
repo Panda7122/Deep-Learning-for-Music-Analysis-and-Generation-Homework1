@@ -1,0 +1,11 @@
+.venv
+.vscode
+__pycache__
+musicfm
+embeddings
+hw1
+test_mel_log
+train_mel_log
+valid_mel_log
+pred.json
+pred_task2.json

@@ -1,0 +1,2 @@
+
+Best performing model (Top-1 Acc): SVM  Top-1 Accuracy: 0.3203  Top-3 Accuracy: 0.5411
