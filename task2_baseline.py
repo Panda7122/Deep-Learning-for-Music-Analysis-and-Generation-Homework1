@@ -251,8 +251,9 @@ if __name__ == "__main__":
         print(f'Top3 Accuracy on validation set: {100 * correct_top3 / total} %')
         acc3.append(correct_top3 / total)
         print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
-    torch.save(model.state_dict(), './checkpoint/task2_baselinev_checkpoint.pth')
-
+    torch.save(model.state_dict(), './checkpoint/task2_baseline_checkpoint.pth')
+    # Load model checkpoint
+    # model.load_state_dict(torch.load('./checkpoint/task2_baseline_checkpoint.pth', map_location=device))
     plt.figure()
     plt.plot(acc1, label='Top-1 Accuracy')
     plt.plot(acc3, label='Top-3 Accuracy')
@@ -267,6 +268,7 @@ if __name__ == "__main__":
     model.eval()
     correct_top1=0
     correct_top3=0
+    total = 0
     with torch.no_grad():
         for inputs, labels, filenames in tqdm(valid_loader, desc="Baseline Confusion Matrix"):
             inputs, labels, filenames = inputs.to(device), labels.to(device), filenames
