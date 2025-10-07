@@ -7,7 +7,7 @@
 - **CPU:** AMD Ryzen 5 7500 or equivalent and above (6 cores, 12 threads)
 - **Memory:** 16GB RAM or more  
 - **Storage:** At least 20GB (for datasets and models)  
-- **GPU (Recommended):** NVIDIA RTX 3090 or above, 24GB VRAM, CUDA support  
+- **GPU (Recommended):** NVIDIA RTX 3090 or above, at least 24GB VRAM, CUDA support  
 - **Operating System:** Arch Linux x86_64(Linux 6.16.10-zen1-1-zen)
 - **Python Version:** 3.12.9  
 
