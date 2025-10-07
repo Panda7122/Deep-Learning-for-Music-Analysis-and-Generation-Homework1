@@ -271,6 +271,10 @@ if __name__ == '__main__':
     # Generate confusion matrix on the validation set
     all_labels = []
     all_preds = []
+    # model.load_state_dict(torch.load('./checkpoint/task2_checkpoint.pth', map_location=device))
+    correct_top1 = 0
+    correct_top3 = 0
+    total = 0
     model.eval()
     with torch.no_grad():
         for inputs, labels in tqdm(valid_loader, desc="Generating Confusion Matrix"):
@@ -295,8 +299,8 @@ if __name__ == '__main__':
     plt.savefig('confusion_matrix_task2.png')
         
     with open('log_task2.txt', 'w') as f:
-        f.write(f"  Top-1 Accuracy: {correct_top1 / total:.4f}")
-        f.write(f"  Top-3 Accuracy: {correct_top3 / total:.4f}")
+        f.write(f"  Top-1 Accuracy: {correct_top1 / total:.4f}\n")
+        f.write(f"  Top-3 Accuracy: {correct_top3 / total:.4f}\n")
     test_dir = './hw1/artist20/test/'
     files = sorted(glob.glob(os.path.join(test_dir, "*.mp3")))
     pred_dict = {}
