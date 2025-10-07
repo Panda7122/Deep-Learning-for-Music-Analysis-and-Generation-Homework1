@@ -65,6 +65,82 @@ audio -> mel spectrogram
 
 <img src="./result/accuracy_curve.png" alt="KNN Confusion Matrix" width="33%"/>
 
+### sample for use task2 checkpoint
+
+```python
+class Conv_2d(nn.Module):
+    def __init__(self, input_channels, output_channels, shape=3, stride=1, pooling=2):
+        super(Conv_2d, self).__init__()
+        self.conv = nn.Conv2d(input_channels, output_channels, shape, stride=stride, padding=shape//2)
+        self.bn = nn.BatchNorm2d(output_channels)
+        self.relu = nn.ReLU()
+        self.mp = nn.MaxPool2d(pooling)
+    def forward(self, x):
+        out = self.mp(self.relu(self.bn(self.conv(x))))
+        return out
+class AudioClassifierCNN(nn.Module):
+    '''
+    Choi et al. 2016
+    Automatic tagging using deep convolutional neural networks.
+    Fully convolutional network.
+    '''
+    def __init__(self,
+                sample_rate=16000,
+                n_fft=512,
+                f_min=0.0,
+                f_max=8000.0,
+                n_mels=96,
+                n_class=50):
+        super(AudioClassifierCNN, self).__init__()
+
+        # Spectrogram
+        self.spec = torchaudio.transforms.MelSpectrogram(sample_rate=sample_rate,
+                                                         n_fft=n_fft,
+                                                         f_min=f_min,
+                                                         f_max=f_max,
+                                                         n_mels=n_mels)
+        self.to_db = torchaudio.transforms.AmplitudeToDB()
+        self.spec_bn = nn.BatchNorm2d(1)
+
+        # FCN
+        self.layer1 = Conv_2d(1, 64, pooling=(2,2))
+        self.layer2 = Conv_2d(64, 128, pooling=(2,2))
+        self.layer3 = Conv_2d(128, 128, pooling=(2,2))
+        self.layer4 = Conv_2d(128, 128, pooling=(2,2))
+        self.layer5 = Conv_2d(128, 64, pooling=(2,2))
+
+        # Global pooling to make the spatial dimensions fixed
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+
+        # Dense
+        self.dense = nn.Linear(64, n_class)
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        # Spectrogram
+        x = self.spec(x)
+        x = self.to_db(x)
+        x = self.spec_bn(x)
+
+        # FCN
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        # Global pool -> flatten -> dense
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.dense(x)
+        # print(x)
+        return x
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = AudioClassifierCNN(n_class=20).to(device)
+model.load_state_dict(torch.load('./checkpoint/task2_checkpoint.pth', map_location=device))
+```
+
 ### baseline structure
 
 ```text
@@ -76,3 +152,30 @@ audio -> musicFM -> embedding
 ### model accuracy curve
 
 <img src="./result/accuracy_curve_baseline.png" alt="KNN Confusion Matrix" width="33%"/>
+
+### sample for use task2 baseline checkpoint
+
+```python
+class Classifier(nn.Module):
+    def __init__(self, time=500, channel=1024, n_classes=20):
+        super(Classifier, self).__init__()
+        self.avgpool = nn.AdaptiveAvgPool1d(1)
+        self.flat = nn.Flatten()
+        self.FC1 = nn.Linear(channel, 128)
+        self.FC2 = nn.Linear(128, n_classes)
+        self.drop = nn.Dropout(0.1)
+        self.relu = nn.ReLU()
+    def forward(self, x):
+        x = x.permute(0, 2, 1)
+        x = self.avgpool(x)
+        x = x.permute(0, 2, 1)
+        x = self.flat(x)
+        x = self.drop(self.relu(self.FC1(x)) )
+        x = self.FC2(x) 
+        return x
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = Classifier(2000,1024,20).to(device)
+
+model.load_state_dict(torch.load('./checkpoint/task2_baseline_checkpoint.pth', map_location=device))
+```
