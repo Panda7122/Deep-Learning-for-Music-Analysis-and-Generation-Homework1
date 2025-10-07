@@ -7,13 +7,14 @@ import json
 from tqdm import tqdm
 from sklearn.preprocessing import  LabelEncoder
 import torchaudio
-
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score, top_k_accuracy_score
 import glob
 import gc
 import torch
 from torch.utils.data import Dataset, DataLoader
 import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module=r"torchaudio\\..*")
+warnings.filterwarnings("ignore", category=UserWarning, message=r".*TorchCodec.*|.*TorchAudio.*|.*streaming_media_decoder.*")
 import torch.nn as nn
 import torch.optim as optim
 class Conv_2d(nn.Module):
@@ -31,11 +32,11 @@ def load_dataset(json_path, base_dir="./"):
         files = json.load(f)
     
     X, y = [], []
-    for file in tqdm(files):
+    for file in files:
         label = file.split("/")[2]  # e.g. "./train_val/aerosmith/..."
         filename = file.split('/')[-1]
         title, ext = os.path.splitext(filename)
-        tqdm.write(f"{label} / {title}")
+        # tqdm.write(f"{label} / {title}")
         X.append(os.path.join(base_dir, file))
         y.append(label)
     
@@ -195,7 +196,7 @@ if __name__ == '__main__':
 
     # make batch size and num_workers configurable to avoid OOM
     BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "4"))
-    NUM_WORKERS = int(os.environ.get("NUM_WORKERS", "1"))
+    NUM_WORKERS = int(os.environ.get("NUM_WORKERS", "6"))
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, collate_fn=pad_collate)
     valid_loader = DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, collate_fn=pad_collate)
@@ -255,8 +256,8 @@ if __name__ == '__main__':
         print(f'Top3 Accuracy on validation set: {100 * correct_top3 / total} %')
         acc3.append(correct_top3 / total)
     # Save the final model state
-    torch.save(model.state_dict(), 'task2_checkpoint.pth')
-    print("Model saved to task2_checkpoint.pth")
+    torch.save(model.state_dict(), './checkpoint/task2_checkpoint.pth')
+    print("Model saved to ./checkpoint/task2_checkpoint.pth")
     # Plotting the accuracy curves
     plt.figure()
     plt.plot(acc1, label='Top-1 Accuracy')
@@ -278,6 +279,12 @@ if __name__ == '__main__':
             _, predicted = torch.max(outputs.data, 1)
             all_labels.extend(labels.cpu().numpy())
             all_preds.extend(predicted.cpu().numpy())
+            _, pred3 = torch.topk(outputs.data, 3, dim=1)
+            for i, label in enumerate(labels):
+                if label in pred3[i]:
+                    correct_top3 += 1
+            total += labels.size(0)
+            correct_top1 += (predicted == labels).sum().item()
 
     cm = confusion_matrix(all_labels, all_preds, labels=np.arange(len(le.classes_)))
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -286,16 +293,7 @@ if __name__ == '__main__':
     plt.title('Confusion Matrix')
     plt.tight_layout()
     plt.savefig('confusion_matrix_task2.png')
-    for inputs, labels in valid_loader:
-        inputs, labels = inputs.to(device), labels.to(device)
-        outputs = model(inputs)
-        _, predicted = torch.max(outputs.data, 1)
-        _, pred3 = torch.topk(outputs.data, 3, dim=1)
-        for i, label in enumerate(labels):
-            if label in pred3[i]:
-                correct_top3 += 1
-        total += labels.size(0)
-        correct_top1 += (predicted == labels).sum().item()
+        
     with open('log_task2.txt', 'w') as f:
         f.write(f"  Top-1 Accuracy: {correct_top1 / total:.4f}")
         f.write(f"  Top-3 Accuracy: {correct_top3 / total:.4f}")

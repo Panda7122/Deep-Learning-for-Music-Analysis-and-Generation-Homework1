@@ -251,6 +251,8 @@ if __name__ == "__main__":
         print(f'Top3 Accuracy on validation set: {100 * correct_top3 / total} %')
         acc3.append(correct_top3 / total)
         print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
+    torch.save(model.state_dict(), './checkpoint/task2_baselinev_checkpoint.pth')
+
     plt.figure()
     plt.plot(acc1, label='Top-1 Accuracy')
     plt.plot(acc3, label='Top-3 Accuracy')

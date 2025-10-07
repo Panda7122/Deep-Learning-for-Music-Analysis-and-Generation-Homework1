@@ -29,6 +29,36 @@ run `python3 task1.py`
 and result will save to `log.txt` and all model's confusion matrix will save to `<model_name>_confusion_matrix.png`
 here is my result
 
-![KNN Confusion Matrix](./result/KNN_confusion_matrix.png)
-![Random Forest Confusion Matrix](./result/RandomForest_confusion_matrix.png)
-![SVN Confusion Matrix](./result/SVM_confusion_matrix.png)
+<img src="./result/KNN_confusion_matrix.png" alt="KNN Confusion Matrix" width="33%"/><img src="./result/RandomForest_confusion_matrix.png" alt="Random Forest Confusion Matrix" width="33%"/><img src="./result/SVM_confusion_matrix.png" alt="SVM Confusion Matrix" width="33%"/>
+
+and best model is SVM
+Top-1 Accuracy: 0.3203  Top-3 Accuracy: 0.5411
+
+## task2
+
+run `python3 task2.py` for model training and predicting test set, result will save to `./pred_task2.json`
+run `python3 task2_baseline.py` for baseline model training
+
+### model structure
+
+```text
+audio -> mel spectrogram
+-> CNN(2 layer FC, hidden layer shape is 128) 
+-> 20 classes probability
+```
+
+### model accuracy curve
+
+<img src="./result/accuracy_curve.png" alt="KNN Confusion Matrix" width="33%"/>
+
+### baseline structure
+
+```text
+audio -> musicFM -> embedding 
+-> average pool from [time, channel] to [channel] -> MLP(2 layer FC, hidden layer shape is 128) 
+-> 20 classes probability
+```
+
+### model accuracy curve
+
+<img src="./result/accuracy_curve_baseline.png" alt="KNN Confusion Matrix" width="33%"/>
