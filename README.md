@@ -34,18 +34,23 @@
 
 ## task 1
 it will run knn, random forest and svm, and use grid search cv for optimize parameter
+
 run `python3 task1.py`
+
 and result will save to `log.txt` and all model's confusion matrix will save to `<model_name>_confusion_matrix.png`
+
 here is my result
 
 <img src="./result/KNN_confusion_matrix.png" alt="KNN Confusion Matrix" width="33%"/><img src="./result/RandomForest_confusion_matrix.png" alt="Random Forest Confusion Matrix" width="33%"/><img src="./result/SVM_confusion_matrix.png" alt="SVM Confusion Matrix" width="33%"/>
 
 and best model is SVM
+
 Top-1 Accuracy: 0.3203  Top-3 Accuracy: 0.5411
 
 ## task2
 
 run `python3 task2.py` for model training and predicting test set, result will save to `./pred_task2.json`
+
 run `python3 task2_baseline.py` for baseline model training
 
 ### model structure
