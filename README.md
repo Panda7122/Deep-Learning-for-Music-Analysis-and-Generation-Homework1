@@ -66,6 +66,9 @@ audio -> mel spectrogram
 <img src="./result/accuracy_curve.png" alt="KNN Confusion Matrix" width="33%"/>
 
 ### sample for use task2 checkpoint
+you can also simple use `python3 evaluate_task2.py` for generate
+
+`confusion_matrix_task2.png`, `log_task2.txt`(validation accuracy), `pred_task2.json`(test set prediction with model)
 
 ```python
 class Conv_2d(nn.Module):
@@ -154,7 +157,9 @@ audio -> musicFM -> embedding
 <img src="./result/accuracy_curve_baseline.png" alt="KNN Confusion Matrix" width="33%"/>
 
 ### sample for use task2 baseline checkpoint
+you can also simple use `python3 evaluate_task2_baseline.py` for generate
 
+`confusion_matrix_task2_baseline.png`, `log_task2_baseline.txt`(validation accuracy)
 ```python
 class Classifier(nn.Module):
     def __init__(self, time=500, channel=1024, n_classes=20):
